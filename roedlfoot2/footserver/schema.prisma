@@ -1,0 +1,59 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  username       String  @unique
+  fullName       String?
+  email          String? @unique
+  hashedPassword String?
+  salt           String?
+  refreshToken   String?
+
+  Team   Team? @relation(fields: [teamId], references: [id])
+  teamId Int?
+  // Participant    Participant[]
+}
+
+// }
+
+// Define the Team model for the tournament teams
+model Team {
+  id Int @id @default(autoincrement())
+
+  players      User[] // Players in the team
+  score        Int           @default(0)
+  participants Participant[]
+
+  match   Match @relation(fields: [matchId], references: [id])
+  matchId Int
+}
+
+// Define the Participant model for keeping track of user-team associations
+model Participant {
+  id Int @id @default(autoincrement())
+
+  team   Team @relation(fields: [teamId], references: [id])
+  userId Int
+
+  teamId Int
+
+  match   Match @relation(fields: [matchId], references: [id])
+  matchId Int
+}
+
+model Match {
+  id           Int           @id @default(autoincrement())
+  name         String
+  startDate    DateTime
+  endDate      DateTime
+  participants Participant[]
+  Team         Team[]
+}

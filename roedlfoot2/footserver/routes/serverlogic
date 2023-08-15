@@ -1,0 +1,36 @@
+const express = require("express")
+const router = express.Router()
+require('dotenv').config();
+
+const axios = require('axios');
+
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
+const cors = require("cors");
+
+router.use(cors());
+router.options('*', cors())
+
+router.get('/create-users', async (req, res) => {
+
+  async function createUser(data) {
+
+    try {
+        await prisma.user.create({
+          data: {
+            username: data.user.username,
+            fullName: data.user.fullName,
+            email: data.user.email,
+          },
+      });
+
+    } catch (error) {
+      console.log('An error occurred:', error);
+      res.status(500).json({ error: 'An error occurred while creating the user.' });
+    }
+
+}})
+
+
